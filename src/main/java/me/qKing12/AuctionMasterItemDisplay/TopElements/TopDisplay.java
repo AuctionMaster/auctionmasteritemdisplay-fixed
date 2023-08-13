@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -244,38 +245,43 @@ public class TopDisplay implements Listener {
     }
 
     private void clearDisplay(){
-        findSigns();
-        isCleared=true;
-        if(this.item!=null)
-            this.item.remove();
-        Bukkit.getScheduler().runTask(AuctionMasterItemDisplay.plugin, () -> {
-            ArmorStand amDownTest = utils.getArmorStandDown(location);
-            if (amDownTest != null) {
-                ArmorStand amUp;
-                amUp = utils.getArmorStandUp(location.clone().add(0, 0.4, 0));
-                amDownTest.setCustomNameVisible(false);
-                if (amUp != null) {
-                    amUp.setCustomNameVisible(false);
-                }
-            } else {
-                ArmorStand amDown = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
-                amDown.setHelmet(AuctionMasterItemDisplay.items.glass.clone());
-                amDown.setVisible(false);
-                amDown.setRemoveWhenFarAway(false);
-                amDown.setGravity(false);
-                amDown.setArms(true);
-                amDown.setLeftArmPose(AuctionMasterItemDisplay.verify);
-                amDown.setBasePlate(false);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                findSigns();
+                isCleared=true;
+                if(item!=null)
+                    item.remove();
+                Bukkit.getScheduler().runTask(AuctionMasterItemDisplay.plugin, () -> {
+                    ArmorStand amDownTest = utils.getArmorStandDown(location);
+                    if (amDownTest != null) {
+                        ArmorStand amUp;
+                        amUp = utils.getArmorStandUp(location.clone().add(0, 0.4, 0));
+                        amDownTest.setCustomNameVisible(false);
+                        if (amUp != null) {
+                            amUp.setCustomNameVisible(false);
+                        }
+                    } else {
+                        ArmorStand amDown = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
+                        amDown.setHelmet(AuctionMasterItemDisplay.items.glass.clone());
+                        amDown.setVisible(false);
+                        amDown.setRemoveWhenFarAway(false);
+                        amDown.setGravity(false);
+                        amDown.setArms(true);
+                        amDown.setLeftArmPose(AuctionMasterItemDisplay.verify);
+                        amDown.setBasePlate(false);
 
-                ArmorStand amUp = (ArmorStand) location.getWorld().spawnEntity(location.clone().add(0, 0.4, 0), EntityType.ARMOR_STAND);
-                amUp.setVisible(false);
-                amUp.setRemoveWhenFarAway(false);
-                amUp.setGravity(false);
-                amUp.setArms(true);
-                amUp.setRightArmPose(AuctionMasterItemDisplay.verify);
-                amUp.setBasePlate(false);
+                        ArmorStand amUp = (ArmorStand) location.getWorld().spawnEntity(location.clone().add(0, 0.4, 0), EntityType.ARMOR_STAND);
+                        amUp.setVisible(false);
+                        amUp.setRemoveWhenFarAway(false);
+                        amUp.setGravity(false);
+                        amUp.setArms(true);
+                        amUp.setRightArmPose(AuctionMasterItemDisplay.verify);
+                        amUp.setBasePlate(false);
+                    }
+                });
             }
-        });
+        }.runTask(AuctionMasterItemDisplay.plugin);
     }
 
     private void placeDisplay(){
